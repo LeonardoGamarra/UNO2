@@ -33,22 +33,5 @@ public class Card
     {
         return special;
     }
-    public String cardTranslator(Card card)
-    {
-        String[] color = {"Red", "Green", "Blue", "Yellow"};
-        String[] special = {"+2", "Reverse", "Block", "Multicolor", "+4"};
-        switch (card.getSpecial())
-        {
-            case 0:
-                return special[card.getSpecial()] + " " + color[card.getColor()];
-            case 1: case 2:
-                return color[card.getColor()] + " " + special[card.getSpecial()];
-            case 3: case 4:
-                return special[card.getSpecial()];
-            case 5:
-                return card.getNumber() + " " + color[card.getColor()];
-            default:
-                return "cardString";
-        }
-    }
+
 }
