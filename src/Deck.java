@@ -96,18 +96,13 @@ public class Deck
         deck.remove(0);
         return card;
     }
+    public void setCard(Card card)
+    {
+        deck.add(card);
+    }
     public void shuffle()
     {
         Collections.shuffle(deck);
     }
-    public void resetDeck(Table table)
-    {
-        if (deck.size() == 0)
-        {
-            for (int i = 0; i < table.getSize(); i++)
-            {
-                deck.add(table.getCard());
-            }
-        }
-    }
+
 }
