@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main
@@ -48,6 +49,7 @@ public class Main
         // Stores if the game is ended
         boolean ended = false;
 
+        int round = 1;
         int reverse = 1;
 
         // Main loop
@@ -59,15 +61,18 @@ public class Main
             int n = -1;
 
             System.out.println();
-
+            System.out.println("PLAY " + round);
             // Player turn
             if (turn == 0)
             {
+                Thread.sleep(1000);
+                printScoreBoard(players);
                 System.out.println("Its your turn!");
                 System.out.println("Last card played: " + cardTranslator(table.peekCard()));
                 do
                 {
                     System.out.println();
+                    players[0].setDeck(organizeDeck(players[0].getDeck()));
                     printPlayerDeck(players[0]);
                     System.out.println("Enter a number to choose a card or (0) to buy:");
 
@@ -126,6 +131,7 @@ public class Main
                         validCard = isCardPlayable(players[turn].peekCard(players[turn].deckSize() - 1), table.peekCard());
                     }
                     while (!validCard);
+                    System.out.println();
                     n = players[turn].deckSize() - 1;
                 }
 
@@ -158,7 +164,12 @@ public class Main
                     for (int i = 0; i < 4; i++)
                     {
                         buyCard(players[correctTurn(players.length, turn + reverse)], deck);
+                        if (correctTurn(players.length, turn + reverse) == 0)
+                        {
+                            sayCard(players[0].peekCard(players[0].deckSize() - 1));
+                        }
                     }
+                    System.out.println();
                     turn += reverse;
                 }
                 else if (table.peekCard().getSpecial() == 0)
@@ -166,7 +177,12 @@ public class Main
                     for (int i = 0; i < 2; i++)
                     {
                         buyCard(players[correctTurn(players.length, turn + reverse)], deck);
+                        if (correctTurn(players.length, turn + reverse) == 0)
+                        {
+                            sayCard(players[0].peekCard(players[0].deckSize() - 1));
+                        }
                     }
+                    System.out.println();
                     turn += reverse;
                 }
                 else if (table.peekCard().getSpecial() == 2)
@@ -178,12 +194,11 @@ public class Main
                     reverse *= -1;
                 }
             }
+            round++;
             turn += reverse;
             turn = correctTurn(players.length, turn);
         }
         while (!ended);
-
-        int b = 0;
     }
     public static String cardTranslator(Card card)
     {
@@ -235,16 +250,16 @@ public class Main
             }
         }
     }
-    public static void buyCard(Player player, Deck deck)
+    public static void buyCard(Player player, Deck deck) throws InterruptedException
     {
-        System.out.println();
+        Thread.sleep(1000);
         if (player.getID() != 0)
             System.out.println("CPU" + player.getID() + " bought a card!");
         player.setCard(deck.getCard());
     }
     public static void sayCard(Card card) throws InterruptedException
     {
-        Thread.sleep(500);
+        Thread.sleep(1000);
         System.out.println("You received " + cardTranslator(card));
     }
     public static boolean isCardPlayable(Card player, Card table)
@@ -305,6 +320,141 @@ public class Main
             return turn - totalPlayer;
         else
             return turn;
+    }
+    public static void printScoreBoard(Player[] players)
+    {
+        System.out.println("-------------- SCOREBOARD --------------");
+        System.out.println("      Player       ||  Cards Remaining  ");
+        for (int i = 0; i < players.length; i++)
+        {
+            if (i == 0)
+                System.out.println(spaceFormatter("You", 19) + "||" + spaceFormatter(String.valueOf(players[i].deckSize()), 19));
+            else
+                System.out.println(spaceFormatter("CPU" + players[i].getID(), 19) + "||" + spaceFormatter(String.valueOf(players[i].deckSize()), 19));
+        }
+        System.out.println("----------------------------------------");
+    }
+    public static String spaceFormatter(String s, int n)
+    {
+        int spaces = n - s.length();
+        StringBuilder result = new StringBuilder();
+        result.append(s);
+        for (int i = 0; i < spaces; i++)
+        {
+            result.append(" ");
+        }
+        return result.toString();
+    }
+    public static ArrayList<Card> organizeDeck(ArrayList<Card> card)
+    {
+        ArrayList<Card> result = new ArrayList<>();
+        ArrayList<Card> red = new ArrayList<>();
+        ArrayList<Card> green = new ArrayList<>();
+        ArrayList<Card> blue = new ArrayList<>();
+        ArrayList<Card> yellow = new ArrayList<>();
+        ArrayList<Card> plus = new ArrayList<>();
+        ArrayList<Card> multicolor = new ArrayList<>();
+        for (int i = 0; i < card.size(); i++)
+        {
+            switch (card.get(i).getColor())
+            {
+                case 0:
+                    red.add(card.get(i));
+                    break;
+                case 1:
+                    green.add(card.get(i));
+                    break;
+                case 2:
+                    blue.add(card.get(i));
+                    break;
+                case 3:
+                    yellow.add(card.get(i));
+                    break;
+                case 4:
+                    multicolor.add(card.get(i));
+                    break;
+                case 5:
+                    plus.add(card.get(i));
+                    break;
+            }
+        }
+        // Red
+        for (int i = 0; i <= 9; i++)
+        {
+            for (int j = 0; j < red.size(); j++)
+            {
+                if (red.get(j).getNumber() == i)
+                    result.add(red.get(j));
+            }
+        }
+        for (int i = 0; i <= 2; i++)
+        {
+            for (int j = 0; j < red.size(); j++)
+            {
+                if (red.get(j).getSpecial() == i)
+                    result.add(red.get(j));
+            }
+        }
+
+        // Green
+        for (int i = 0; i <= 9; i++)
+        {
+            for (int j = 0; j < green.size(); j++)
+            {
+                if (green.get(j).getNumber() == i)
+                    result.add(green.get(j));
+            }
+        }
+        for (int i = 0; i <= 2; i++)
+        {
+            for (int j = 0; j < green.size(); j++)
+            {
+                if (green.get(j).getSpecial() == i)
+                    result.add(green.get(j));
+            }
+        }
+
+        // Blue
+        for (int i = 0; i <= 9; i++)
+        {
+            for (int j = 0; j < blue.size(); j++)
+            {
+                if (blue.get(j).getNumber() == i)
+                    result.add(blue.get(j));
+            }
+        }
+        for (int i = 0; i <= 2; i++)
+        {
+            for (int j = 0; j < blue.size(); j++)
+            {
+                if (blue.get(j).getSpecial() == i)
+                    result.add(blue.get(j));
+            }
+        }
+
+        // Yellow
+        for (int i = 0; i <= 9; i++)
+        {
+            for (int j = 0; j < yellow.size(); j++)
+            {
+                if (yellow.get(j).getNumber() == i)
+                    result.add(yellow.get(j));
+            }
+        }
+        for (int i = 0; i <= 2; i++)
+        {
+            for (int j = 0; j < yellow.size(); j++)
+            {
+                if (yellow.get(j).getSpecial() == i)
+                    result.add(yellow.get(j));
+            }
+        }
+
+        // Multicolor and +4
+        result.addAll(multicolor);
+        result.addAll(plus);
+
+        return result;
     }
     public static void printReverseCard()
     {
