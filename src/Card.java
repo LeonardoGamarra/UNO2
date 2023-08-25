@@ -3,7 +3,7 @@ public class Card
     // numbers (0 - 9, 10 for specials)
     private int number;
 
-    // colors (red(0), green(1), blue(2), yellow(3))
+    // colors (red(0), green(1), blue(2), yellow(3), for multicolor(4), for +4(5))
     private int color;
 
     // special (+2(0), reverse(1), block(2), multicolor(3), +4(4), default(5))

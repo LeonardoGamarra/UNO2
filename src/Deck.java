@@ -1,15 +1,12 @@
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class Deck
-{
+public class Deck {
     private ArrayList<Card> deck = new ArrayList<>();
 
-    public Deck()
-    {
+    public Deck() {
         // Initializes deck, with blank cards
-        for (int i = 0; i < deck.size(); i++)
-        {
+        for (int i = 0; i < deck.size(); i++) {
             deck.add(new Card());
         }
 
@@ -17,36 +14,31 @@ public class Deck
 
         // Red cards
         Card[] cDeck = deckGenerator(0);
-        for (int i = 0; i < 25; i++)
-        {
+        for (int i = 0; i < 25; i++) {
             deck.add(cDeck[i]);
         }
 
         // Green cards
         cDeck = deckGenerator(1);
-        for (int i = 0; i < 25; i++)
-        {
+        for (int i = 0; i < 25; i++) {
             deck.add(cDeck[i]);
         }
 
         // Blue cards
         cDeck = deckGenerator(2);
-        for (int i = 0; i < 25; i++)
-        {
+        for (int i = 0; i < 25; i++) {
             deck.add(cDeck[i]);
         }
 
         // Yellow cards
         cDeck = deckGenerator(3);
-        for (int i = 0; i < 25; i++)
-        {
+        for (int i = 0; i < 25; i++) {
             deck.add(cDeck[i]);
         }
 
         // Multicolor cards
 
-        for (int i = 0; i < 4; i++)
-        {
+        for (int i = 0; i < 4; i++) {
             Card card = new Card();
             card.setSpecial(3);
             card.setColor(4);
@@ -56,8 +48,7 @@ public class Deck
 
         // +4 cards
 
-        for (int i = 0; i < 4; i++)
-        {
+        for (int i = 0; i < 4; i++) {
             Card card = new Card();
             card.setSpecial(4);
             card.setColor(5);
@@ -66,6 +57,7 @@ public class Deck
         }
 
     }
+
     public static Card[] deckGenerator(int color) {
         Card[] colorDeck = new Card[25];
         for (int i = 0; i < 25; i++) {
@@ -85,35 +77,39 @@ public class Deck
             }
         }
         for (int i = 19; i < 25; i++) {
-            if (i < 21)
-            {
+            if (i < 21) {
                 colorDeck[i].setSpecial(0);
-            }
-            else if (i < 23)
-            {
+            } else if (i < 23) {
                 colorDeck[i].setSpecial(1);
-            }
-            else
-            {
+            } else {
                 colorDeck[i].setSpecial(2);
             }
             colorDeck[i].setNumber(10);
         }
         return colorDeck;
     }
-    public Card getCard()
-    {
+
+    public Card getCard() {
         Card card = deck.get(0);
         deck.remove(0);
         return card;
     }
-    public void setCard(Card card)
-    {
+
+    public void setCard(Card card) {
+        if (card.getSpecial() == 3)
+            card.setColor(4);
+        else if (card.getSpecial() == 4)
+            card.setColor(5);
         deck.add(card);
     }
-    public void shuffle()
-    {
+
+    public void shuffle() {
         Collections.shuffle(deck);
+    }
+
+    public int getSize()
+    {
+        return deck.size();
     }
 
 }
