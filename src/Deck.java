@@ -49,6 +49,8 @@ public class Deck
         {
             Card card = new Card();
             card.setSpecial(3);
+            card.setColor(4);
+            card.setNumber(10);
             deck.add(card);
         }
 
@@ -58,6 +60,8 @@ public class Deck
         {
             Card card = new Card();
             card.setSpecial(4);
+            card.setColor(5);
+            card.setNumber(10);
             deck.add(card);
         }
 
@@ -82,11 +86,18 @@ public class Deck
         }
         for (int i = 19; i < 25; i++) {
             if (i < 21)
+            {
                 colorDeck[i].setSpecial(0);
+            }
             else if (i < 23)
+            {
                 colorDeck[i].setSpecial(1);
+            }
             else
+            {
                 colorDeck[i].setSpecial(2);
+            }
+            colorDeck[i].setNumber(10);
         }
         return colorDeck;
     }

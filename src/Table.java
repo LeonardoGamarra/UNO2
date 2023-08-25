@@ -19,6 +19,6 @@ public class Table
     }
     public Card peekCard()
     {
-        return table.get(0);
+        return table.get(table.size() - 1);
     }
 }

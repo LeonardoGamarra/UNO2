@@ -1,6 +1,6 @@
 public class Card
 {
-    // numbers (0 - 9)
+    // numbers (0 - 9, 10 for specials)
     private int number;
 
     // colors (red(0), green(1), blue(2), yellow(3))
