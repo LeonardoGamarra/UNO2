@@ -6,7 +6,7 @@ public class Main
     public static void main(String[] args) throws InterruptedException {
         Scanner in = new Scanner(System.in);
         System.out.println("Welcome to UNO!");
-        System.out.println("Select the number of players:");
+        System.out.println("Select the number of players (2 - 8): ");
         Player[] players;
         players = new Player[in.nextInt()];
 
@@ -50,18 +50,94 @@ public class Main
 
         int round = 1;
         int reverse = 1;
+        int totalToBuy = 0;
 
         // Main loop
         do {
             // Declares variables used to receive and analyze inputs
-            boolean bought;
-            boolean validCard;
+            boolean block = false;
+            boolean bought = false;
+            boolean validCard = false;
             int n = -1;
 
             System.out.println();
             System.out.println("PLAY " + round);
+
+            // Buys cards from the last round
+            if (totalToBuy != 0)
+            {
+                // Sets block
+                block = true;
+
+                // Tests if the player has a stackable card
+                for (int i = 0; i < players[turn].deckSize(); i++) {
+                    if (isCardStackPlayable(players[turn].peekCard(i), table.peekCard())) {
+                        n = i;
+                        validCard = true;
+                        break;
+                    }
+                }
+
+                if (validCard && turn == 0)
+                {
+                    Thread.sleep(1000);
+                    printScoreBoard(players, reverse);
+                    System.out.println("Its your turn!");
+                    Thread.sleep(1000);
+                    System.out.println("Would you like to stack " + cardTranslator(players[turn].peekCard(n)) + " to " + cardTranslator(table.peekCard()) + "? (0) Yes / (1) No");
+                    n = in.nextInt();
+
+
+                    if (n == 0) {
+
+                        do {
+                            System.out.println();
+                            players[0].setDeck(organizeDeck(players[0].getDeck()));
+                            printPlayerDeck(players[0]);
+                            System.out.println("Enter a number to choose a card:");
+
+                            // Receives player input
+                            n = in.nextInt() - 1;
+                            validCard = false;
+
+                            // Checks if player has the card
+                            if (n >= players[0].deckSize() || n < 1)
+                                System.out.println("Invalid number!");
+                            // If it has the card, checks if it can be played
+                            else
+                                validCard = isCardStackPlayable(players[0].peekCard(n), table.peekCard());
+                            if (!validCard)
+                                System.out.println("This card can`t be played!");
+
+                        } while ((n >= players[0].deckSize() && n < 1) || !validCard);
+
+                    }
+                    else
+                        validCard = false;
+
+                }
+                if (!validCard)
+                {
+                    if (turn == 0)
+                        System.out.println("You have to buy " + totalToBuy + " cards!");
+                    else
+                        System.out.println("CPU" + players[turn].getID() + " has to buy " + totalToBuy + " cards!");
+                    for (int i = 0; i < totalToBuy; i++) {
+                        buyCard(players[turn], deck, table);
+
+                        if (turn == 0)
+                            sayCard(players[0].peekCard(players[0].deckSize() - 1));
+                    }
+
+                    totalToBuy = 0;
+                }
+
+            }
+
+
+
             // Player turn
-            if (turn == 0) {
+            if (turn == 0 && !block) {
                 Thread.sleep(1000);
                 printScoreBoard(players, reverse);
                 System.out.println("Its your turn!");
@@ -103,11 +179,12 @@ public class Main
             }
 
             // CPU turn
-            else {
+            else if (!block) {
                 // Searches for a playable card
                 for (int i = 0; i < players[turn].deckSize(); i++) {
                     if (isCardPlayable(players[turn].peekCard(i), table.peekCard())) {
                         n = i;
+                        validCard = true;
                         break;
                     }
                 }
@@ -126,52 +203,50 @@ public class Main
 
             }
 
-            // Plays card
+            // Plays card, if there is a card to play
+            if (validCard) {
+                // If the card is a Multicolor or a +4
+                if (players[turn].peekCard(n).getSpecial() == 3 || players[turn].peekCard(n).getSpecial() == 4) {
+                    int color;
 
-            if (players[turn].peekCard(n).getSpecial() == 3 || players[turn].peekCard(n).getSpecial() == 4) {
-                int color;
-                if (turn == 0) {
-                    System.out.println("Choose a color: \u001B[31m(1)\u001B[0m \u001B[32m(2)\u001B[0m \u001B[34m(3)\u001B[0m \u001B[33m(4)\u001B[0m");
-                    color = in.nextInt();
-                } else {
-                    color = chooseColor(players[turn]);
+                    // Asks the player for the color
+                    if (turn == 0) {
+                        System.out.println("Choose a color: \u001B[31m(1)\u001B[0m \u001B[32m(2)\u001B[0m \u001B[34m(3)\u001B[0m \u001B[33m(4)\u001B[0m");
+                        color = in.nextInt();
+
+                        // If it is not player turn, automatically chooses a color
+                    } else {
+                        color = chooseColor(players[turn]);
+                    }
+
+                    // Set the card to the chosen color
+                    players[turn].peekCard(n).setColor(color - 1);
                 }
-                players[turn].peekCard(n).setColor(color - 1);
-            }
 
-            playCard(n, players[turn], table);
-            ended = isGameOver(players);
+                // Play the chosen card
+                playCard(n, players[turn], table);
+                ended = isGameOver(players);
 
-            if (table.peekCard().getSpecial() != 5) {
-                if (table.peekCard().getSpecial() == 4) {
-                    for (int i = 0; i < 4; i++) {
-                        buyCard(players[correctTurn(players.length, turn + reverse)], deck, table);
-                        if (correctTurn(players.length, turn + reverse) == 0) {
-                            sayCard(players[0].peekCard(players[0].deckSize() - 1));
-                        }
-                    }
-                    System.out.println();
-                    turn += reverse;
-                } else if (table.peekCard().getSpecial() == 0) {
-                    for (int i = 0; i < 2; i++) {
-                        buyCard(players[correctTurn(players.length, turn + reverse)], deck, table);
-                        if (correctTurn(players.length, turn + reverse) == 0) {
-                            sayCard(players[0].peekCard(players[0].deckSize() - 1));
-                        }
-                    }
-                    System.out.println();
-                    turn += reverse;
-                } else if (table.peekCard().getSpecial() == 2) {
-                    turn += reverse;
-                } else if (table.peekCard().getSpecial() == 1) {
-                    reverse *= -1;
+
+                // If a special card was played
+                if (table.peekCard().getSpecial() != 5) {
+                    if (table.peekCard().getSpecial() == 4)
+                        totalToBuy += 4;
+                    else if (table.peekCard().getSpecial() == 0)
+                        totalToBuy += 2;
+                    else if (table.peekCard().getSpecial() == 2)
+                        turn += reverse;
+                    else if (table.peekCard().getSpecial() == 1)
+                        reverse *= -1;
                 }
             }
+
             round++;
             turn += reverse;
             turn = correctTurn(players.length, turn);
         }
         while (!ended);
+
         for (int i = 0; i < players.length; i++)
         {
             if (players[i].deckSize() == 0)
@@ -252,6 +327,11 @@ public class Main
     {
         Thread.sleep(1000);
         System.out.println("You received " + cardTranslator(card));
+    }
+    public static boolean isCardStackPlayable(Card player, Card table)
+    {
+        // Used to stack +2 and +4
+        return player.getSpecial() == table.getSpecial() && player.getNumber() == table.getNumber();
     }
     public static boolean isCardPlayable(Card player, Card table)
     {
